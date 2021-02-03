@@ -3,21 +3,17 @@
 #include "bvh.h"
 
 #include <float.h>
-
 #include <curand_kernel.h>
 
-
 __device__
-vec3 miss_colour(const ray& r)
-{
+vec3 miss_colour(const ray& r) {
 	vec3 unit_direction = unit_vector(r.direction);
 	float t = .5 * (unit_direction.y() + 1.0);
 	return (1.0f-t)*vec3(1.0, 1.0, 1.0) + t*vec3(.5, .7, 1.0);
 }
 
 __device__
-vec3 colour(const ray& r, BVHNode* bvh_root, curandState* rand_state, int max_bounces)
-{
+vec3 colour(const ray& r, BVHNode* bvh_root, curandState* rand_state, int max_bounces) {
 	hit_record rec;
 	ray this_ray(r.origin, r.direction);
 	vec3 out_colour(0, 0, 0);
@@ -51,8 +47,7 @@ vec3 colour(const ray& r, BVHNode* bvh_root, curandState* rand_state, int max_bo
 }
 
 __global__
-void initialize_renderer(int width, int height, curandState* rand_state)
-{
+void initialize_renderer(int width, int height, curandState* rand_state) {
 	int x = blockIdx.x * blockDim.x + threadIdx.x;
 	int y = blockIdx.y * blockDim.y + threadIdx.y;
 

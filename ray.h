@@ -1,10 +1,8 @@
-#ifndef RAY_H
-#define RAY_H
+#pragma once
 
 #include "vec3.h"
 
-struct ray
-{
+struct ray {
 	__device__ ray() {}
 	__device__ ray(vec3 origin, vec3 direction) :
 		origin(origin), direction(direction) {}
@@ -12,10 +10,7 @@ struct ray
 	vec3 origin;
 	vec3 direction;
 
-	__device__ vec3 point_at_parameter(float t) const
-	{
+	__device__ vec3 point_at_parameter(float t) const {
 		return origin + t * direction;
 	}
 };
-
-#endif

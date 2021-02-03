@@ -1,11 +1,8 @@
-#ifndef SHADING_UTILS_H
-#define SHADING_UTILS_H
+#pragma once
 
 #include "vec3.h"
 
-
-__device__ vec3 reflect(const vec3& v, const vec3& n)
-{
+__device__ vec3 reflect(const vec3& v, const vec3& n) {
 	return v - 2 * dot(v, n) * n;
 }
 
@@ -30,5 +27,3 @@ __device__ bool refract(const vec3& v, const vec3& n, float ni_over_nt, vec3& re
         return false;
 }
 }
-
-#endif

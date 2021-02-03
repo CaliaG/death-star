@@ -1,23 +1,13 @@
-/*
- * This is an implementation of the following paper by Tero karras
- * https://research.nvidia.com/sites/default/files/pubs/2012-06_Maximizing-Parallelism-in/karras2012hpg_paper.pdf
- *
- * Some of it is copied directly from the additional explanation
- * blog post https://devblogs.nvidia.com/thinking-parallel-part-iii-tree-construction-gpu/
-*/
-#ifndef BVH_H
-#define BVH_H
+#pragma once
 
 #include "hittable.h"
 
 #include <cstdio>
-
 #include <thrust/sort.h>
 
 // Expands a 10-bit integer into 30 bits
 // by inserting 2 zeros after each bit.
-__device__ unsigned int expandBits(unsigned int v)
-{
+__device__ unsigned int expandBits(unsigned int v) {
 	// Copied directly from https://devblogs.nvidia.com/thinking-parallel-part-iii-tree-construction-gpu/
     v = (v * 0x00010001u) & 0xFF0000FFu;
     v = (v * 0x00000101u) & 0x0F00F00Fu;
@@ -28,8 +18,7 @@ __device__ unsigned int expandBits(unsigned int v)
 
 // Calculates a 30-bit Morton code for the
 // given 3D point located within the unit cube [0,1].
-__device__ unsigned int morton3D(vec3 point)
-{
+__device__ unsigned int morton3D(vec3 point) {
 	// Copied directly from https://devblogs.nvidia.com/thinking-parallel-part-iii-tree-construction-gpu/
     float x = min(max(point.x() * 1024.0f, 0.0f), 1023.0f);
     float y = min(max(point.y() * 1024.0f, 0.0f), 1023.0f);
@@ -40,9 +29,8 @@ __device__ unsigned int morton3D(vec3 point)
     return xx * 4 + yy * 2 + zz;
 }
 
-__device__ int common_prefix(unsigned int* morton_codes, int i, int j, int num_hittables)
-{
-	if(i < 0 || i >= num_hittables || j < 0 || j >= num_hittables)
+__device__ int common_prefix(unsigned int* morton_codes, int i, int j, int num_hittables) {
+	if (i < 0 || i >= num_hittables || j < 0 || j >= num_hittables)
 		return -1;
 
 	unsigned int morton_i = morton_codes[i];
@@ -60,10 +48,8 @@ enum class bvh_node_type
 	leaf
 };
 
-struct __align__(32) BVHNode
-{
-	__device__ static BVHNode internal()
-	{
+struct __align__(32) BVHNode {
+	__device__ static BVHNode internal() {
 		BVHNode node;
 		node.type = bvh_node_type::internal;
 		node.atomic_visited_flag = 0;
@@ -72,8 +58,7 @@ struct __align__(32) BVHNode
 		return node;
 	}
 
-	__device__ static BVHNode leaf()
-	{
+	__device__ static BVHNode leaf() {
 		BVHNode node;
 		node.type = bvh_node_type::leaf;
 		node.atomic_visited_flag = 0;
@@ -92,10 +77,8 @@ struct __align__(32) BVHNode
 	AABB bounding_box;
 };
 
-__device__ uint2 determine_range(unsigned int *morton_codes, int i, int num_leaf_nodes)
-{
-	if(i == 0)
-	{
+__device__ uint2 determine_range(unsigned int *morton_codes, int i, int num_leaf_nodes) {
+	if(i == 0) {
 		return make_uint2(0, num_leaf_nodes-1);
 	}
 
@@ -113,9 +96,8 @@ __device__ uint2 determine_range(unsigned int *morton_codes, int i, int num_leaf
 	int l = 0;
 	int t = lmax >> 1; // Equivalent to t = lmax / 2;
 
-	while(t > 0)
-	{
-		if(common_prefix(morton_codes, i, i + (l + t) * d, num_leaf_nodes) > delta_min)
+	while (t > 0) {
+		if (common_prefix(morton_codes, i, i + (l + t) * d, num_leaf_nodes) > delta_min)
 			l += t;
 		t /= 2;
 	}
@@ -140,8 +122,7 @@ __device__ unsigned int find_split(unsigned int *morton_codes, const uint2& rang
 	int l = range.y >= range.x ? range.y - range.x : range.x - range.y;
 	int divider = 2;
 
-	for(int t=(l+divider-1)/divider; t>0; divider*=2)
-	{
+	for(int t=(l+divider-1)/divider; t>0; divider*=2) {
 		if(common_prefix(morton_codes, range.x, range.x + (s + t) * d,
 					num_leaf_nodes) > delta_node)
 			s += t;
@@ -400,5 +381,3 @@ __device__ bool hit_BVH(BVHNode* root, const ray& r,
 
 	return any_hit;
 }
-
-#endif

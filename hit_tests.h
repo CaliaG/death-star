@@ -1,12 +1,11 @@
-#ifndef HIT_TESTS_H
-#define HIT_TESTS_H
+#pragma once
 
 #include "vec3.h"
 
 // Hit record used for storing and sharing intersection data
 struct Material;
-struct hit_record
-{
+
+struct hit_record {
 	float t;
 	vec3 p;
 	vec3 normal;
@@ -116,5 +115,3 @@ __device__ bool hit_AABB(const vec3& min, const vec3& max, const ray& r,
 
 	return true;
 }
-
-#endif

@@ -1,12 +1,8 @@
-#ifndef SCENE_H
-#define SCENE_H
+#pragma once
 
 struct Hittable;
 
-struct Scene
-{
+struct Scene {
 	int num_hittables;
 	Hittable* hittables;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef HITTABLE_H
-#define HITTABLE_H
+#pragma once
 
 #include "ray.h"
 #include "AABB.h"
@@ -10,8 +9,7 @@ struct Material;  // Define Material, so it can be stored on Hittables
 // From here on we define all hittable types, and in the end
 // the base Hittable struct, which will be able to represent
 // a hittable of certain type
-enum class hittable_type
-{
+enum class hittable_type {
 	// hittable_type used in union to specify the type of
 	// hittable a Hittable struct is representing
 	sphere,
@@ -32,8 +30,7 @@ struct Triangle
 	vec3 normal;
 };
 
-class Hittable
-{
+class Hittable {
 	// Thanks to the discriminating union pattern we can represent
 	// different hittable types without polymorphism
 	public:
@@ -115,4 +112,3 @@ class Hittable
 			Triangle _triangle;
 		};
 };
-#endif

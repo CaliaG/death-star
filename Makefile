@@ -22,7 +22,7 @@ dbg:
 	$(NVCC) $(NVCCFLAGS_DEBUG) -o main main.o
 
 run: main
-	rm -f render.jpg
+	rm -f image.jpg
 	./main
 
 profile: main
@@ -32,4 +32,4 @@ profile_metrics: main
 	nvprof $(NVPROF_FLAGS) ./main
 
 clean:
-	rm -f main main.o render.jpg
+	rm -f main main.o image.jpg image.ppm

@@ -75,6 +75,22 @@ void createScene(Scene& scene, curandState* rand_state) {
 	// manually_populate_scene<<<1, 1>>>(scene.hittables, obj.num_triangles + obj2.num_triangles, rand_state);
 }
 
+void save_to_ppm(float *fb, int nx, int ny) {
+    std::ofstream ofs;
+    ofs.open("./image.ppm", std::ios::out | std::ios::binary);
+    ofs << "P3\n" << nx << " " << ny << "\n255\n";
+        for (int j = ny-1; j >= 0; j--) {
+            for (int i = 0; i < nx; i++) {
+                size_t pixel_index = j*nx + i;
+                int ir = int(255.99*fb[pixel_index * 3 + 0]);
+                int ig = int(255.99*fb[pixel_index * 3 + 1]);
+                int ib = int(255.99*fb[pixel_index * 3 + 2]);
+                ofs << ir << " " << ig << " " << ib << "\n";
+            }
+        }
+    ofs.close();
+}
+
 void save_to_jpg(float *fb, int nx, int ny) {
     uint8_t* imgBuff = (uint8_t*)std::malloc(nx * ny * 3 * sizeof(uint8_t));
     for (int j = ny - 1; j >= 0; --j) {
@@ -100,7 +116,6 @@ int main(int argc, char** argv) {
 	int height = 500;
 	int num_samples = 32;
 	int max_bounces = 5;
-	char* out_file = "image.ppm";
 
 	printf("Initializing death-star for %ix%i pixels, %i samples and %i max bounces\n",
 			width, height, num_samples, max_bounces);
@@ -146,29 +161,11 @@ int main(int argc, char** argv) {
 	cudaMemcpy(pixel_buffer, d_pixel_buffer,
 			width * height * 3 * sizeof(float), cudaMemcpyDeviceToHost);
 
-	// Write into ppm file
-	std::ofstream out(out_file);
-	std::streambuf *coutbuf = std::cout.rdbuf(); // Store old buf
-	std::cout.rdbuf(out.rdbuf()); // Redirect cout to out_file
-
-	std::cout<< "P3\n" << width << " " << height << "\n255\n";
-	for (int y = height - 1; y >= 0; y--) {
-		for (int x = 0; x < width; x++) {
-			int pixel_id = y * width + x;
-			int int_r = int(255.99 * pixel_buffer[pixel_id * 3 + 0]);
-			int int_g = int(255.99 * pixel_buffer[pixel_id * 3 + 1]);
-			int int_b = int(255.99 * pixel_buffer[pixel_id * 3 + 2]);
-			std::cout<< int_r <<" "<< int_g << " " << int_b <<std::endl;
-		}
-	}
-
-	// Restore cout buf
-	std::cout.rdbuf(coutbuf);
-
     stop = clock();
     double timer_seconds = ((double)(stop - start)) / CLOCKS_PER_SEC;
     std::cout << "took " << timer_seconds << " seconds.\n";
 
+	//save_to_ppm(pixel_buffer, width, height);
 	save_to_jpg(pixel_buffer, width, height);
 
 	return 0;

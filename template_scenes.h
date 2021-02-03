@@ -1,5 +1,4 @@
-#ifndef SCENES_H
-#define SCENES_H
+#pragma once
 
 #include "material.h"
 #include "hittable.h"
@@ -7,7 +6,6 @@
 
 #include <curand_kernel.h>
 #include <iostream>
-
 
 __device__
 void create_RTOW_three_spheres_on_top_of_big_sphere_scene(Hittable* hittables, int start_id)
@@ -148,5 +146,3 @@ void create_RTOW_random_spheres_scene(Hittable* hittables, int start_id, curandS
     hittables[i++] = Hittable::sphere(vec3(-4, 1, 0), 1.0, Material::lambertian(vec3(0.4, 0.2, 0.1)));
     hittables[i++] = Hittable::sphere(vec3(4, 1, 0), 1.0, Material::metal(vec3(0.7, 0.6, 0.5), 0.0));
 }
-
-#endif
