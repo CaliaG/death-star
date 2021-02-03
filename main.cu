@@ -14,7 +14,6 @@
 
 #include <curand_kernel.h>
 
-
 // Since memory for hittables must already be allocated when creating
 // them on the GPU, I currently store a static number of how many hittables
 // are manually created - num_manually_defined_hittables.
@@ -84,6 +83,9 @@ int main(int argc, char** argv) {
 	// Calculate blocks and threads
 	int tx = 8, ty = 8; // bucket size
 	
+    clock_t start, stop;
+	start = clock();
+	
 	dim3 blocks(width/tx + 1, height/ty + 1);
 	dim3 threads(tx, ty);
 
@@ -139,6 +141,10 @@ int main(int argc, char** argv) {
 
 	// Restore cout buf
 	std::cout.rdbuf(coutbuf);
+
+    stop = clock();
+    double timer_seconds = ((double)(stop - start)) / CLOCKS_PER_SEC;
+    std::cout << "took " << timer_seconds << " seconds.\n";
 
 	return 0;
 }
