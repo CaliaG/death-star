@@ -44,44 +44,39 @@ void manually_populate_scene(Hittable* hittables, int start_id, curandState* ran
 			Material::dielectric(1.5));
 }
 
-void createScene(Scene& scene, curandState* rand_state)
-{
-	objData obj = load_obj("/home/vshotarov/Downloads/dragonZ.obj");
-	objData obj2 = load_obj("/home/vshotarov/Downloads/bunnyZ.obj");
-	scene.num_hittables = obj.num_triangles + obj2.num_triangles + num_manually_defined_hittables;
+void createScene(Scene& scene, curandState* rand_state) {
+    objData obj = load_obj("/content/death-star/models/bunny.obj");
+    //objData obj2 = load_obj("/content/raytracing_renderer_cuda/models/bunny.obj");
+	scene.num_hittables = obj.num_triangles + num_manually_defined_hittables;
+	// scene.num_hittables = obj.num_triangles + obj2.num_triangles + num_manually_defined_hittables;
 
 	cudaMalloc(&(scene.hittables), scene.num_hittables * sizeof(Hittable));
 
 	Material* material;
 	cudaMalloc(&(material), sizeof(Material));
-
 	create_lambertian<<<1, 1>>>(material, vec3(.5, .1, .45));
 
-	Material* material2;
-	cudaMalloc(&(material2), sizeof(Material));
-	create_metal<<<1, 1>>>(material2, vec3(.1, .3, .5), .5);
+	// Material* material2;
+	// cudaMalloc(&(material2), sizeof(Material));
+	// create_metal<<<1, 1>>>(material2, vec3(.1, .3, .5), .5);
 
 	int obj_threads = 512;
-    int obj_dims = (obj.num_triangles + obj_threads - 1) / obj_threads;
+		int obj_dims = (obj.num_triangles + obj_threads - 1) / obj_threads;
 	create_obj_hittables<<<obj_dims, obj_threads>>>(scene.hittables, material, obj, 0);
 
-    obj_dims = (obj2.num_triangles + obj_threads - 1) / obj_threads;
-	create_obj_hittables<<<obj_dims, obj_threads>>>(scene.hittables, material2, obj2, obj.num_triangles);
+		// obj_dims = (obj2.num_triangles + obj_threads - 1) / obj_threads;
+	// create_obj_hittables<<<obj_dims, obj_threads>>>(scene.hittables, material2, obj2, obj.num_triangles);
 
-	manually_populate_scene<<<1, 1>>>(scene.hittables, obj.num_triangles + obj2.num_triangles, rand_state);
+	manually_populate_scene<<<1, 1>>>(scene.hittables, obj.num_triangles, rand_state);
+	// manually_populate_scene<<<1, 1>>>(scene.hittables, obj.num_triangles + obj2.num_triangles, rand_state);
 }
 
-int main(int argc, char** argv)
-{
-	// Parse arguments
-	// NOTE this is very erronous at the moment as there is no
-	// error catching, validation, etc.
-	char *endptr;
-	int width = strtol(argv[1], &endptr, 10);
-	int height = strtol(argv[2], &endptr, 10);
-	int num_samples = strtol(argv[3], &endptr, 10);
-	int max_bounces = strtol(argv[4], &endptr, 10);
-	char* out_file = argv[5];
+int main(int argc, char** argv) {
+	int width = 1000;
+	int height = 500;
+	int num_samples = 100;
+	int max_bounces = 50;
+	char* out_file = "image.ppm";
 
 	printf("Initializing death-star for %ix%i pixels, %i samples and %i max bounces\n",
 			width, height, num_samples, max_bounces);

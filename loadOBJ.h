@@ -1,12 +1,10 @@
-#ifndef LOAD_OBJ_H
-#define LOAD_OBJ_H
+#pragma once
 
 #include "material.h"
 #include "hittable.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION // define this in only *one* .cc
-#include <tiny_obj_loader.h>
-
+#include "dep/include/tiny_obj_loader.h"
 
 struct shapeData
 {
@@ -24,9 +22,7 @@ struct objData
 };
 
 __global__
-void create_obj_hittables(Hittable* hittables, Material* material,
-		objData obj, int start_id)
-{
+void create_obj_hittables(Hittable* hittables, Material* material, objData obj, int start_id) {
 	int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
 	if(idx >= obj.num_triangles)
@@ -64,8 +60,7 @@ void create_obj_hittables(Hittable* hittables, Material* material,
 			material);
 }
 
-objData load_obj(const char* obj_file)
-{
+objData load_obj(const char* obj_file) {
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
@@ -132,5 +127,3 @@ objData load_obj(const char* obj_file)
 
 	return data;
 }
-
-#endif
