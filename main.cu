@@ -14,6 +14,11 @@
 
 #include <curand_kernel.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "libs/stb/stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "libs/stb/stb_image_write.h"
+
 // Since memory for hittables must already be allocated when creating
 // them on the GPU, I currently store a static number of how many hittables
 // are manually created - num_manually_defined_hittables.
@@ -70,11 +75,31 @@ void createScene(Scene& scene, curandState* rand_state) {
 	// manually_populate_scene<<<1, 1>>>(scene.hittables, obj.num_triangles + obj2.num_triangles, rand_state);
 }
 
+void save_to_jpg(float *fb, int nx, int ny) {
+    uint8_t* imgBuff = (uint8_t*)std::malloc(nx * ny * 3 * sizeof(uint8_t));
+    for (int j = ny - 1; j >= 0; --j) {
+        for (int i = 0; i < nx; ++i) {
+            size_t index = j * nx + i;
+            // -- stbi generates a Y flipped image
+            size_t rev_index = (ny - j - 1) * nx + i;
+            float r = fb[index * 3 + 0];
+            float g = fb[index * 3 + 1];
+			float b = fb[index * 3 + 2];
+            imgBuff[rev_index * 3 + 0] = int(255.999f * r) & 255;
+            imgBuff[rev_index * 3 + 1] = int(255.999f * g) & 255;
+            imgBuff[rev_index * 3 + 2] = int(255.999f * b) & 255;
+        }
+    }
+    //stbi_write_png("out.png", nx, ny, 3, imgBuff, nx * 3);
+    stbi_write_jpg("image.jpg", nx, ny, 3, imgBuff, 100);
+    std::free(imgBuff);
+}
+
 int main(int argc, char** argv) {
 	int width = 1000;
 	int height = 500;
-	int num_samples = 100;
-	int max_bounces = 50;
+	int num_samples = 32;
+	int max_bounces = 5;
 	char* out_file = "image.ppm";
 
 	printf("Initializing death-star for %ix%i pixels, %i samples and %i max bounces\n",
@@ -127,17 +152,15 @@ int main(int argc, char** argv) {
 	std::cout.rdbuf(out.rdbuf()); // Redirect cout to out_file
 
 	std::cout<< "P3\n" << width << " " << height << "\n255\n";
-	for(int y=height-1; y>=0; y--)
-		for(int x=0; x<width; x++)
-		{
+	for (int y = height - 1; y >= 0; y--) {
+		for (int x = 0; x < width; x++) {
 			int pixel_id = y * width + x;
-
 			int int_r = int(255.99 * pixel_buffer[pixel_id * 3 + 0]);
 			int int_g = int(255.99 * pixel_buffer[pixel_id * 3 + 1]);
 			int int_b = int(255.99 * pixel_buffer[pixel_id * 3 + 2]);
-
 			std::cout<< int_r <<" "<< int_g << " " << int_b <<std::endl;
 		}
+	}
 
 	// Restore cout buf
 	std::cout.rdbuf(coutbuf);
@@ -145,6 +168,8 @@ int main(int argc, char** argv) {
     stop = clock();
     double timer_seconds = ((double)(stop - start)) / CLOCKS_PER_SEC;
     std::cout << "took " << timer_seconds << " seconds.\n";
+
+	save_to_jpg(pixel_buffer, width, height);
 
 	return 0;
 }
