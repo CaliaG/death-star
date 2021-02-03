@@ -58,7 +58,7 @@ void initialize_renderer(int width, int height, curandState* rand_state) {
 
 	// Initialize random number states for each pixel
 	int seed = 2020;
-	curand_init(seed, pixel_id, 0, &rand_state[pixel_id]);
+	curand_init(seed + pixel_id, 0, 0, &rand_state[pixel_id]);
 }
 
 __global__
