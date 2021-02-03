@@ -4,6 +4,11 @@
 #include "random.h"
 #include "shading_utils.h"
 
+#include <curand.h>
+#include <curand_kernel.h>
+
+#define RND (curand_uniform(&local_rand_state))
+
 // Material types
 enum class material_type {
 	lambertian,
@@ -164,4 +169,20 @@ void create_lambertian(Material* material, vec3 colour) {
 __global__
 void create_metal(Material* material, vec3 colour, float fuzz) {
 	*material = *Material::metal(colour, fuzz);
+}
+
+__global__
+void create_metal(Material* material, curandState* rand_state) {
+	curandState local_rand_state = *rand_state;
+
+	vec3 color = vec3(.1f * (1.f + RND), .5f * (1.f + RND), .5f * (1.f + RND));
+	float fuzz = .5f * RND;
+	*material = *Material::metal(color, fuzz);
+
+    *rand_state = local_rand_state;
+}
+
+__global__
+void create_dielectric(Material* material, float refractive_idx) {
+	*material = *Material::dielectric(refractive_idx);
 }

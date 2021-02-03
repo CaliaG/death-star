@@ -281,8 +281,7 @@ void calculate_BVH_bounding_boxes(BVHNode* leaf_nodes, Hittable* hittables, int 
 	}
 }
 
-BVHNode* create_BVH(Hittable* hittables, int num_hittables)
-{
+BVHNode* create_BVH(Hittable* hittables, int num_hittables) {
 	int threads = 512;
 	int dims = (num_hittables + threads - 1) / threads;
 

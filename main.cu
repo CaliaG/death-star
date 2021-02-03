@@ -58,7 +58,10 @@ void createScene(Scene& scene, curandState* rand_state) {
 
 	Material* material;
 	cudaMalloc(&(material), sizeof(Material));
-	create_lambertian<<<1, 1>>>(material, vec3(.5, .1, .45));
+	//create_metal<<<1, 1>>>(material, vec3(.1, .3, .5), .5);
+	//create_metal<<<1, 1>>>(material, rand_state);
+	//create_lambertian<<<1, 1>>>(material, vec3(.5, .1, .45));
+	create_dielectric<<<1, 1>>>(material, 1.5f);
 
 	// Material* material2;
 	// cudaMalloc(&(material2), sizeof(Material));
