@@ -19,25 +19,18 @@ vec3 colour(const ray& r, BVHNode* bvh_root, curandState* rand_state, int max_bo
 	vec3 out_colour(0, 0, 0);
 	vec3 attenuation(1,1,1);
 
-	for(int d=0; d<max_bounces; d++)
-	{
-		if(hit_BVH(bvh_root, this_ray, .0001, MAXFLOAT, rec))
-		{
+	for (int d=0; d<max_bounces; d++) {
+		if (hit_BVH(bvh_root, this_ray, .0001, MAXFLOAT, rec)) {
 			ray scattered;
 			vec3 this_attenuation;
 
-			if(rec.material->scatter(this_ray, rec, this_attenuation, scattered, rand_state))
-			{
+			if (rec.material->scatter(this_ray, rec, this_attenuation, scattered, rand_state)) {
 				this_ray = scattered;
 				attenuation *= this_attenuation;
-			}
-			else
-			{
+			} else {
 				break;
 			}
-		}
-		else
-		{
+		} else {
 			out_colour = miss_colour(r);
 			break;
 		}

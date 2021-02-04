@@ -22,7 +22,7 @@ struct objData
 };
 
 __global__
-void create_obj_hittables(Hittable* hittables, Material* material, objData obj, int start_id) {
+void create_obj_hittables(Hittable* hittables, Material* material, objData obj, int start_id, float scale) {
 	int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
 	if (idx >= obj.num_triangles) return;
@@ -39,8 +39,6 @@ void create_obj_hittables(Hittable* hittables, Material* material, objData obj, 
 		}
 		tri_count += obj.shapes[s].size;
 	}
-
-	float scale = .5f;
 
 	// Triangles
 	float triangle_points[9];

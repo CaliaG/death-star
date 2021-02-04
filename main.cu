@@ -68,11 +68,11 @@ void createScene(Scene& scene, curandState* rand_state) {
 	create_metal<<<1, 1>>>(material2, vec3(.1, .3, .5), .5);
 
 	int obj_threads = 512;
-		int obj_dims = (obj.num_triangles + obj_threads - 1) / obj_threads;
-	create_obj_hittables<<<obj_dims, obj_threads>>>(scene.hittables, material, obj, 0);
+	int obj_dims = (obj.num_triangles + obj_threads - 1) / obj_threads;
+	create_obj_hittables<<<obj_dims, obj_threads>>>(scene.hittables, material, obj, 0, 0.8f);
 
 	obj_dims = (obj2.num_triangles + obj_threads - 1) / obj_threads;
-	create_obj_hittables<<<obj_dims, obj_threads>>>(scene.hittables, material2, obj2, obj.num_triangles);
+	create_obj_hittables<<<obj_dims, obj_threads>>>(scene.hittables, material2, obj2, obj.num_triangles, 0.5f);
 
 	// manually_populate_scene<<<1, 1>>>(scene.hittables, obj.num_triangles, rand_state);
 	manually_populate_scene<<<1, 1>>>(scene.hittables, obj.num_triangles + obj2.num_triangles, rand_state);
