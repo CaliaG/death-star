@@ -25,17 +25,14 @@ __global__
 void create_obj_hittables(Hittable* hittables, Material* material, objData obj, int start_id) {
 	int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-	if(idx >= obj.num_triangles)
-		return;
+	if (idx >= obj.num_triangles) return;
 
 	// Identify triangle ID
 	int tri_count = 0;
 	int tri_id = 0;
 	int shape_id = 0;
-	for(int s=0; s<obj.num_shapes; s++)
-	{
-		if(idx < tri_count + obj.shapes[s].size)
-		{
+	for (int s=0; s<obj.num_shapes; s++) {
+		if (idx < tri_count + obj.shapes[s].size) {
 			tri_id = idx - tri_count;
 			shape_id = s;
 			break;
@@ -43,14 +40,15 @@ void create_obj_hittables(Hittable* hittables, Material* material, objData obj, 
 		tri_count += obj.shapes[s].size;
 	}
 
+	float scale = .5f;
+
 	// Triangles
 	float triangle_points[9];
-	for(int v=0; v<3; v++)
-	{
+	for (int v = 0; v < 3; v++) {
 		tinyobj::index_t idx = obj.shapes[shape_id].indices[tri_id*3 + v];
-		triangle_points[v*3 + 0] = obj.vertices[3*idx.vertex_index+0];
-		triangle_points[v*3 + 1] = obj.vertices[3*idx.vertex_index+1];
-		triangle_points[v*3 + 2] = obj.vertices[3*idx.vertex_index+2];
+		triangle_points[v*3 + 0] = obj.vertices[3*idx.vertex_index+0] * scale;
+		triangle_points[v*3 + 1] = obj.vertices[3*idx.vertex_index+1] * scale;
+		triangle_points[v*3 + 2] = obj.vertices[3*idx.vertex_index+2] * scale;
 	}
 
 	hittables[start_id + idx] = Hittable::triangle(
