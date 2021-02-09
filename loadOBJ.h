@@ -49,7 +49,7 @@ void create_obj_hittables(Hittable* hittables, Material* material, objData obj, 
 		triangle_points[v*3 + 2] = obj.vertices[3*idx.vertex_index+2] * scale;
 	}
 
-	hittables[start_id + idx] = Hittable::triangle(
+	hittables[start_id + idx] = Triangle(
 			vec3(triangle_points[0], triangle_points[1], triangle_points[2]),
 			vec3(triangle_points[3], triangle_points[4], triangle_points[5]),
 			vec3(triangle_points[6], triangle_points[7], triangle_points[8]),

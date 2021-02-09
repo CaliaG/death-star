@@ -7,6 +7,7 @@
 #include "bvh.h"
 #include "loadOBJ.h"
 #include "render.cu"
+#include "scene.h"
 
 #include <iostream>
 #include <fstream>
@@ -40,12 +41,9 @@ __global__
 void manually_populate_scene(Hittable* hittables, int start_id, curandState* rand_state)
 {
 #define num_manually_defined_hittables 3
-	hittables[start_id+0] = Hittable::sphere(vec3(0,-1000,0), 1000,
-			Material::lambertian(vec3(0.2, 0.2, 0.35)));
-	hittables[start_id+1] = Hittable::sphere(vec3(0,.5,0), .5,
-			Material::metal(vec3(.5, .5, .5), .0));
-	hittables[start_id+2] = Hittable::sphere(vec3(.7,.25,0), .25,
-			Material::dielectric(1.5));
+	hittables[start_id+0] = Sphere(vec3(0,-1000,0), 1000, Material::lambertian(vec3(0.2, 0.2, 0.35)));
+	hittables[start_id+1] = Sphere(vec3(0,.5,0), .5, Material::metal(vec3(.5, .5, .5), .0));
+	hittables[start_id+2] = Sphere(vec3(.7,.25,0), .25, Material::dielectric(1.5));
 }
 
 void createScene(Scene& scene, curandState* rand_state) {
