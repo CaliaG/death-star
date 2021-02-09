@@ -115,9 +115,9 @@ void save_to_jpg(float *fb, int nx, int ny) {
 }
 
 int main(int argc, char** argv) {
-	int width = 1920;
-	int height = 1080;
-	int num_samples = 100;
+	int width = 800;
+	int height = 400;
+	int num_samples = 10;
 	int max_bounces = 8;
 
 	printf("Initializing death-star for %ix%i pixels, %i samples and %i max bounces\n",
